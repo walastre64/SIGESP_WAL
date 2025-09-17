@@ -1,0 +1,485 @@
+<?PHP
+include("conexion/conexionsqlsrv.php");
+include("validacion/validacion.php");
+conectate();
+session_start(); 
+session_destroy();
+session_unset();
+session_start();
+?>
+<!--[if lt IE 10]> <!DOCTYPE html> <meta http-equiv="X-UA-Compatible" content="chrome=1"> <![endif]--> 
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">	
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no, user-scalable=no">
+    <meta http-equiv="Expires" content="0" />
+    <meta http-equiv="Pragma"  content="no-cache" />
+	
+    <link rel='shortcut icon' type='image/x-icon' href='imagenes/ICO/ipsfa.ico' />
+	<link rel="stylesheet"  href="css/style_login.css"/> 
+
+	<!-- JQUERY -->
+	<script src="jquery/jquery-3.3.1.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">-->
+	<link rel="stylesheet" href="bootstrap/dist/awesome/css/font-awesome.min.css" 	crossorigin="anonymous">
+	<link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css" 				crossorigin="anonymous">
+	<link rel="stylesheet" href="bootstrap/dist/toastr/toastr.min.css"  			crossorigin="anonymous">
+	<!-- FIM Bootstrap CSS -->	
+    <title>Acceso:: SIGESP-SAINT</title>
+
+
+<style type="text/css">
+<!--
+body {font-family: Arial, Helvetica, sans-serif;}
+#pie{
+	font-size: 14px;
+}
+#div_titulo {
+	
+	background:red;
+	color:#FFFFFF;
+	box-shadow: 5px 5px grey;
+   -webkit-box-shadow: 5px 5px 5px grey;
+   -moz-box-shadow: 5px 5px 5px grey;
+	text-shadow: 2px 2px 4px #000000;
+}
+
+#div_caja1{
+
+	background:#EAEAEA;
+	box-shadow: 10px 10px grey;
+}
+#div_caja2{
+	background:#FFFFFF;	
+	color:#FFFFFF;
+	padding: 20px 180px;
+	margin: 10px;
+	
+	background-image: url(imagenes/png/saint_sigesp.png);
+}
+
+
+#div_caja3{
+	background:#AFE79C;
+	padding: 20px 5px;
+	margin: 5px;	
+	border-radius: 50px;
+}
+
+input,textarea{
+	padding:10px;
+	width:100%;
+	outline:none;
+	transition: all 0.15s ease-in-out;
+	border-radius:3px;
+	border:1px solid rgba(0,0,0,0.2);
+	
+}
+
+footer{
+	margin: 0 auto;
+	display:block;
+	border-radius:0.5em;
+	width:96%;
+	vertical-align:middle;
+	text-align:center;
+}
+-->
+</style>
+
+<script type="text/javascript">
+$(document).ready(function(){
+
+  
+	$('#txt_usuario').focus();
+	$("#div_registrar").hide();
+	
+	$('#login-form-link').click(function(e) {
+
+		$("#div_login").delay("slow").fadeIn();	
+		$("#div_registrar").fadeOut(100);
+		$('#register-form-link').removeClass('active');
+		$(this).addClass('active');
+		e.preventDefault();
+		$('#txt_usuario').focus();
+		$("#txt_usuario").val("");
+		$("#txt_password").val("");		
+	});
+	
+	$('#register-form-link').click(function(e) {
+
+		$("#div_registrar").delay("slow").fadeIn();
+		$("#div_login").fadeOut(100);	
+		$('#login-form-link').removeClass('active');
+		$(this).addClass('active');
+		e.preventDefault();	
+		$('#txt_cedulaR').focus();
+		$("#txt_usuario").val("");
+		$("#txt_password").val("");			
+	});
+	
+
+
+	var TimeOut = 15;
+
+	$("#txt_usuario").keypress(function(e){
+	
+		TimeOutTempo = TimeOut;
+		var code = (e.keyCode ? e.keyCode : e.which);
+		 if(code == 13) { 
+			$("#btn_login").click();
+		 }
+	
+	});
+	
+	$("#txt_password").keypress(function(e){
+	
+		TimeOutTempo = TimeOut;
+		var code = (e.keyCode ? e.keyCode : e.which);
+		 if(code == 13) { 
+			$("#btn_login").click();
+		 }
+	
+	});	
+	
+	
+	$("#btn_login").click(function(){	
+	 	
+		 var User = $.trim($("#txt_usuario").val());
+		 var Pass = $.trim($("#txt_password").val());			
+
+		if(User.length <1 || User.length < 8)
+		{
+			 toastr.error("Error en en Campo -- <b> CEDULA <b/> --", "Error !!!", {
+			  "showDuration": "50",
+			  "hideDuration": "500",
+			  "timeOut": "2000",
+			  "extendedTimeOut": "1000",
+			  "preventDuplicates": true,
+			  "onclick": null,
+			  "progressBar": true,
+			  "positionClass": "toast-bottom-full-width"
+        	});	
+			$("#txt_usuario").focus();
+			return false;
+		}	
+
+		if(Pass.length <1 )
+		{
+			 toastr.error("Error en en Campo -- <b> PASSWORD <b/> --", "Error !!!", {
+			  "showDuration": "50",
+			  "hideDuration": "500",
+			  "timeOut": "2000",
+			  "extendedTimeOut": "1000",
+			  "preventDuplicates": true,
+			  "onclick": null,
+			  "progressBar": true,
+			  "positionClass": "toast-bottom-full-width"
+        	});	
+			$("#txt_password").focus();
+			document.getElementById('txt_password').value = '';
+			return false;		
+		}	
+		
+		var tamano; 
+		tamano = (Pass.length);
+		
+		if(tamano < 4)
+		{
+			 toastr.error("El en en Campo -- <b> PASSWORD <b/> -- debe tener mas de 4 Caracteres", "Error !!!", {
+			  "showDuration": "50",
+			  "hideDuration": "500",
+			  "timeOut": "2000",
+			  "extendedTimeOut": "1000",
+			  "preventDuplicates": true,
+			  "onclick": null,
+			  "progressBar": true,
+			  "positionClass": "toast-bottom-full-width"
+        	});	
+			$("#txt_password").focus();
+			document.getElementById('txt_password').value = '';
+			return false;	
+		}
+		//--------------------------------------- fin validacion			
+		
+		$.ajax({
+		type: "POST",
+		dataType:"html",
+		url: "datos/bus_usuario_registrado.php",
+		data:"txt_usuario="+$("#txt_usuario").val()+
+			 "&txt_password="+$("#txt_password").val(),
+		cache: false,			
+		success: function(result) {	
+		resultado=result.split("/");
+		//alert(result);
+			if(resultado[0] == 1){		
+					
+				location.href='menu/principal.php';
+				return result;
+			
+			}else{
+			    toastr.error('Usuario ó Clave incorreta !!!', "Error !!!", {
+				"showDuration": "50","hideDuration": "500","timeOut": "2000","extendedTimeOut": "1000","preventDuplicates": true,"onclick": null,"progressBar": true,"positionClass": "toast-bottom-full-width"        		});	
+			    $("#txt_password").focus();
+				return false;			
+			}		
+		},			
+		error: function(error) {				
+			alert("Problemas con el Ingreso al Sistema ... comuniquese con el Personal de Sistemas !!!" + error);
+			}		
+		});	
+	});	<!-- fin btn_login -->
+	
+	
+	
+	$("#btn_registrar").click(function(){		
+
+		var cedula = $.trim($("#txt_cedulaR").val());			
+
+		if(cedula.length <1 || cedula.length < 8)
+		{
+			 toastr.error("Error en en Campo -- <b> CEDULA <b/> --", "Error !!!", {
+			  "showDuration": "50",
+			  "hideDuration": "500",
+			  "timeOut": "2000",
+			  "extendedTimeOut": "1000",
+			  "preventDuplicates": true,
+			  "onclick": null,
+			  "progressBar": true,
+			  "positionClass": "toast-bottom-full-width"
+        	});	
+			$("#txt_cedulaR").focus();
+			return false;
+		}
+				
+		var regex = /[\w-\.]{2,}@([\w-]{2,}\.)*([\w-]{2,}\.)[\w-]{2,4}/;		
+		if (regex.test($('#txt_email').val().trim()) == false) {
+			 toastr.error("Error en en Campo -- <b> Email <b/> --", "Error !!!", {
+			  "showDuration": "50",
+			  "hideDuration": "500",
+			  "timeOut": "2000",
+			  "extendedTimeOut": "1000",
+			  "preventDuplicates": true,
+			  "onclick": null,
+			  "progressBar": true,
+			  "positionClass": "toast-bottom-full-width"
+        	});	
+			$("#txt_email").focus();
+			return false				
+		}	
+		
+		var regex2 =/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,15}[^'\s]/;
+		//alert(regex2.test($('#txt_email').val());
+		var pas1 = $('#txt_passwordR').val();
+		var pas2 = $('#txt_confirmar').val();
+		if (regex2.test(pas1.trim()) == false){
+			 toastr.error("Error en en Campo -- <b> Passwor <b/> -- <br>- Minimo 6 caracteres <br>- Maximo 8 caracteres <br>- Al menos una letra mayúscula <br>- Al menos una letra minucula <br>- Al menos un dígito <br>- No espacios en blanco <br>- Al menos 1 caracter especial", "Error !!!", {
+			  "showDuration": "50",
+			  "hideDuration": "500",
+			  "timeOut": "2000",
+			  "extendedTimeOut": "1000",
+			  "preventDuplicates": true,
+			  "onclick": null,
+			  "progressBar": true,
+			  "positionClass": "toast-bottom-full-width"
+        	});	
+			$("#txt_passwordR").focus();
+			return false				
+		}
+		if(pas1 != pas2){
+			   toastr.error("Error en en Campo -- <b>La Confirmación no coincide con el Password <b/>", 
+			   "Error !!!", {
+			  "showDuration": "50",
+			  "hideDuration": "500",
+			  "timeOut": "2000",
+			  "extendedTimeOut": "1000",
+			  "preventDuplicates": true,
+			  "onclick": null,
+			  "progressBar": true,
+			  "positionClass": "toast-bottom-full-width"
+        	});	
+			$("#txt_passwordR").focus();
+			return false	
+		}
+		
+		$.ajax({
+		type: "POST",
+		dataType:"html",
+		url: "datos/alm_usuario_registrado.php",
+		data:"txt_usuario="+$("#txt_usuario").val()+
+			 "&txt_password="+$("#txt_password").val()+
+			 "&txt_email="+$("#txt_email").val(),
+		cache: false,			
+		success: function(result) {	
+		resultado=result.split("/");
+		alert(result);
+			if(resultado[0] == 1){				
+
+				toastr.success('Datos Eliminados con Éxito !!!', "Exito !!!", {
+				"showDuration": "50","hideDuration": "500","timeOut": "2000","extendedTimeOut": "1000","preventDuplicates": true,"onclick": null,"progressBar": true,"positionClass": "toast-bottom-full-width"});
+				setTimeout(function(){ desbloquea();}, 5000);
+
+				location.href='menu/principal.php';
+				return result;
+			
+			}else{
+			    toastr.error('Usuario ó Clave incorreta !!!', "Error !!!", {
+				"showDuration": "50","hideDuration": "500","timeOut": "2000","extendedTimeOut": "1000","preventDuplicates": true,"onclick": null,"progressBar": true,"positionClass": "toast-bottom-full-width"        		});	
+			    $("#txt_password").focus();
+				return false;			
+			}		
+		},			
+		error: function(error) {				
+			alert("Problemas con el Ingreso al Sistema ... comuniquese con el Personal de Sistemas !!!" + error);
+			}		
+		});	
+		
+				
+	}); <!-- fin btn_registrar-->
+	
+}); <!-- fin document.ready -->
+</script>
+</head>  
+<script type="text/javascript">
+	var texto  = 'Chrome';
+	var texto2 = 'Firefox';
+	var texto3 = 'Safari';
+	var cadena= navigator.userAgent;
+		if(cadena.indexOf(texto) == -1  && cadena.indexOf(texto2) == - 1 && cadena.indexOf(texto3) == - 1){
+		   window.location.href="restringir/explorador.html";
+	}
+</script> 
+
+
+  
+<body oncontextmenu="return false" id="body" background="imagenes/GIF/bodybkg.gif";>
+
+<div id="container" class="container">
+     <div id="div_titulo" class="row justify-content-center border rounded">
+		<h4 class="pt-3 pb-2"><strong>Sistema de Integración SAINT - SIGESP</strong></h4>
+	 </div> <!--fin div_titulo -->
+
+	 <div id="div_caja1" class="row justify-content-center border rounded">
+		<div id="div_caja2" class=" modal-body container-fluid border justify-content-center rounded border border-success"  >
+			<div id="div_caja3" class="col-lg-12 rounded">	
+				<div id="col12" class="col-md-12 col-md-offset-3">
+					<div id="panellogin" class="panel panel-login">
+						<div id="panelheading" class="panel-heading border rounded">
+							
+							<div id="row" class="row justify-content-center">
+								<div class="col-sm-5 justify-content-center">
+									<br>
+									<a href="#" class="active" id="login-form-link">Login</a>
+								</div>								
+								<div class="col-sm-1 justify-content-center">
+									<br>
+									<h4><strong>|</strong></h4>
+								</div>								
+								<div class="col-sm-5 justify-content-center">
+									<br>
+									<a href="#"  id="register-form-link">Registrarse</a>
+						
+								</div>	
+							</div>									
+												
+							
+							<hr color="#333333" width="500px" >	
+						
+							<div id="div_login" style="padding:20px;">	
+							<br>	
+								<form method="POST"  name="login-form" class="form-horizontal" id="login-form">									
+
+									<div class="form-group input-control text full-size" data-role="input">
+										<input type="text" style="width:500px"  required="" name="txt_usuario" id="txt_usuario"     tabindex="1" placeholder="Cedula"   maxlength="8" onKeyPress="return solonumeros(event)" onFocus="this.style.backgroundColor='#DDFEDA'" onBlur="this.style.backgroundColor='white'">										
+									</div>
+				
+									<div align="center" class="form-group input-control text full-size" data-role="input">
+										<input type="password" style="width:500px" name="txt_password" id="txt_password" tabindex="2" placeholder="Password" maxlength="50" 									 onFocus="this.style.backgroundColor='#DDFEDA'" onBlur="this.style.backgroundColor='white'">
+									</div>	
+									
+								  <div class="form-group input-control text full-size" data-role="input" >
+										<input type="checkbox" tabindex="3" class="" name="remember" id="remember">
+										<label  style="color:#333333;" for="label">Recuerdame </label>										
+								  </div>	
+									<hr  color="#333333" width="500px">						
+									<br>
+									<div class="form-group text-center">
+										<div class="row">
+											<div class="mx-auto" style="width: 300px;">
+												<input  type="button" name="btn_login" id="btn_login" tabindex="4"  class="form-control btn btn-outline-success" value="Aceptar">									
+											</div>
+										</div>
+									</div>
+				
+									<div class="form-group">
+										<div class="row">
+											<div class="col-lg-12">
+												<div class="text-center">
+													<a href="paginas/olvidosuclave.php" tabindex="5" class="forgot-password">olvidó su contraseña?</a>									</div>
+											</div>
+										</div>
+									</div>
+							  </form>
+						  </div><!-- fin div_login -->
+						
+								<!-- rgistrar -->
+								<div align="center" id="div_registrar">
+									<br>
+									<form id="register-form" action="" method="post" role="form" >
+										<div align="center" class="form-group">
+											<input type="text" style="width:500px" 		name="txt_cedulaR" 		id="txt_cedulaR" 	  tabindex="1"  placeholder="Cedula" maxlength="8" onKeyPress="return solonumeros(event)" onFocus="this.style.backgroundColor='#DDFEDA'" onBlur="this.style.backgroundColor='white'" value="" required>
+										</div>
+										 
+										<div class="form-group">
+											<div  class="input-group">
+												<input style="width:250px" type="text"  id="txt_nombre" 	tabindex="2" placeholder="Nombres">				
+												<input style="width:250px" type="text"  id="txt_apellido" 	tabindex="3" placeholder="Apellidos">
+											</div>
+										</div>
+										
+										<div align="center"  class="form-group">
+											<input type="email" style="width:500px" 	name="email" 			id="txt_email"		  tabindex="4"  placeholder="Direccion Email" 		onFocus="this.style.backgroundColor='#DDFEDA'" onBlur="this.style.backgroundColor='white'" value="" required>
+										</div>
+										<div align="center"  class="form-group">
+											<input type="password" style="width:500px" 	name="password" 		id="txt_passwordR"	  tabindex="5"  placeholder="Password" 				onFocus="this.style.backgroundColor='#DDFEDA'" onBlur="this.style.backgroundColor='white'" required>
+										</div>
+										<div align="center"  class="form-group">
+											<input type="password" style="width:500px" 	name="txt_confirmar"    id="txt_confirmar" 	  tabindex="6"  placeholder="Confirm Password" 	onFocus="this.style.backgroundColor='#DDFEDA'" onBlur="this.style.backgroundColor='white'" required>
+										</div>
+										<div class="form-group">
+											<div class="row">
+												<div class="mx-auto" style="width:300px;">
+													<input type="submit" style="width:200px" name="btn_registrar" id="btn_registrar" tabindex="7" class="form-control btn btn-outline-success" value="Registrarse">
+												</div>
+											</div>
+										</div>
+									</form>					
+								</div><!-- fin div_registrar -->							
+						</div><!--fin panelheading -->
+					</div><!--fin row -->	
+					</div><!--fin panellogin -->				
+				</div><!--fin col12 -->			
+			</div><!--fin div_caja3 -->		
+				<footer>
+					<b id="pie">2018, Innova Soluciones, S.A &copy; Elaborado por la <a href="mailto:walastre@hotmail.com"> Gerencia de Sistemas Innova Soluciones</a></b>				
+				</footer>	
+		</div> <!--fin div_caja2 -->
+	 
+	 
+	 </div>  <!--fin div_caja1 -->
+</div> <!--fin container -->
+
+<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->
+   <!-- Optional JavaScript -->
+   <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+   <script type='text/javascript' src="validacion/validacion_general.js"></script>   	
+   <script type='text/javascript' src="bootstrap/dist/toastr/toastr.min.js"></script>   
+   <script src="jquery/popper.min.js" crossorigin="anonymous"></script>
+   <script src="bootstrap/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+<!-- ////////////////////////////////////////////////////////////////////////////////////////////////////////////// -->	
+  </body>
+</html>
